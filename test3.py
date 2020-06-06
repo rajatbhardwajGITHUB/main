@@ -20,7 +20,7 @@ def files(dir, base_url):
         f2.write('')
 
 direct('project')
-files('project', 'https://www.geeksforgeeks.org/python-custom-list-split/')
+files('project', 'https://automatetheboringstuff.com/')
 
 r = open("project/queue.txt", "r")
 
@@ -32,39 +32,47 @@ print(cont)
 re = urllib.request.urlopen(cont)
 
 #checking the content-type of the page
-if re.getheader('content-type') == 'text/html':
-    print(re)
+if re.getheader('content-type') == 'text/html' or 'text/css':
+    #print(re)
     html = re.read()
+    #print(html)
     strings = html.decode('utf-8')
-    print(strings)
+    #print(strings)
 
 #htmlpraser subclass for collecting the urls
 class finder(HTMLParser):
     def __init__(self, base):
         super().__init__()      #for accessing the instance-attributes of the mainclass
         self.base = base        
-        self.links = set()      
+        self.links = []      
 
     def handle_starttag(self, tag, attrs):
         #checking for the 'anchor' tags and 'href' attributes
+        
         if tag == 'a':
+            print("entring the data")
             for (attr, value) in attrs:
                 if attr == 'href':
-                    url = urllib.parse.urljoin(self.base, value) #for completing the url if any is incomplete
-                    self.links.add(url)
+                    url = urllib.parse.urljoin(self.base, value + "\n") #for completing the url if any is incomplete
+                    self.links.append(url)
 
     #def link(self):
     #   print(self.links)
     
     #storing the links in the file created
-    def store_links(self):
-        #convert the set() into string 
-        emp = str(self.links) 
-        file = open('queue.txt', 'a')
-        file.write(emp)
-        file.close()
+    
 
-
-fq = finder("https://www.geeksforgeeks.org/") #main or homapage for the completion of any incomplete url
+fq = finder("https://automatetheboringstuff.com/") #main or homapage for the completion of any incomplete url
 fq.feed(strings)        #feeding the parser with the html/css code
-fq.store_links()
+
+
+def store_links(lik):
+        #convert the set() into string 
+        #print(self.links)
+    with open('project/queue.txt', 'a') as f:
+        for i in lik:
+        
+            f.writelines("%s \n" % i)
+            
+        f.close()
+store_links(fq.links)

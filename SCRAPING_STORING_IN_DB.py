@@ -3,11 +3,12 @@ from urllib import parse
 from html.parser import HTMLParser
 import os
 import mysql.connector
+# all the unusal print() statements are just for small debugging
 
-connect = mysql.connector.connect(user = 'root', 
-                                  password = 'lucifer123#321', 
-                                  host = 'localhost', 
-                                  database = 'flaskapp')
+connect = mysql.connector.connect(user = 'USER_NAME', 
+                                  password = 'PASSWORD', 
+                                  host = 'HOST_NAME', 
+                                  database = 'DATABASE_NAME')
 cursor = connect.cursor()
 
 # creating the directories
@@ -63,10 +64,6 @@ class finder(HTMLParser):
                     url = urllib.parse.urljoin(self.base, value + "," + "\n") #for completing the url if any is incomplete
                     self.links.append(url)
 
-    #def link(self):
-    #   print(self.links)
-    
-    #storing the links in the file created
     
 
 fq = finder("https://automatetheboringstuff.com/") #main or homapage for the completion of any incomplete url
@@ -80,9 +77,12 @@ def store_links(lik):
             
              break
         else:
+          # convert the list of string into list of tuple as the function executemany() takes only
+          #list of tuples as parameter
+            
             tuple_list = [tuple(map(str, sub.split(', '))) for sub in lik]
             #print(i)    
-            formula = ("""INSERT INTO url_links (url) VALUES (%s);""")
+            formula = ("""INSERT INTO table_name (url) VALUES (%s);""")
             #print(tuple_list)
 
             cursor.executemany(formula, tuple_list)
@@ -90,17 +90,6 @@ def store_links(lik):
     
     
     
-    
-        #convert the set() into string 
-"""  
-#print(self.links)
-with open('project/queue.txt', 'a') as f:
-        for i in lik:
-        
-            f.writelines("%s \n" % i)
-            
-        f.close()
-    """
 store_links(fq.links)
 cursor.close()
 connect.close()
